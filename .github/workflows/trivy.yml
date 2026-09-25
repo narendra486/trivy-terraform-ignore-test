@@ -1,0 +1,55 @@
+name: Trivy Config Scan
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+
+jobs:
+  trivy-config:
+    name: Trivy Terraform misconfig scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Trivy config scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: config
+          scan-ref: .
+          severity: CRITICAL,HIGH,MEDIUM
+          exit-code: "1"
+          format: table
+          # Do not use "trivyignores" for YAML — use TRIVY_IGNOREFILE below.
+        env:
+          # Path is relative to the repo root (checkout working directory).
+          # File MUST exist at this path or the job fails fatally.
+          TRIVY_IGNOREFILE: .trivyignore.yaml
+          TRIVY_SHOW_SUPPRESSED: "true"
+
+      - name: Upload Trivy SARIF (informational)
+        if: always()
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: config
+          scan-ref: .
+          severity: CRITICAL,HIGH,MEDIUM
+          format: sarif
+          output: trivy-results.sarif
+          exit-code: "0"
+        env:
+          TRIVY_IGNOREFILE: .trivyignore.yaml
+
+      - name: Upload SARIF to GitHub Security
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        continue-on-error: true
+        with:
+          sarif_file: trivy-results.sarif

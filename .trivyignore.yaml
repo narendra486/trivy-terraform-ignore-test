@@ -1,0 +1,33 @@
+# Place this file at the REPOSITORY ROOT (next to .github/).
+#
+# Why root?
+# - GitHub Actions checks out the repo and scans from scan-ref: "."
+# - Paths in this file are relative to that scan root
+# - YAML ignore files are EXPERIMENTAL and MUST be passed explicitly
+#   via TRIVY_IGNOREFILE / --ignorefile (they are NOT auto-loaded)
+#
+# CI pitfall: if the workflow sets TRIVY_IGNOREFILE to a path that does
+# not exist, Trivy exits FATAL and the pipeline fails. Keep this file
+# committed at the path the workflow references.
+#
+# Do NOT use aquasecurity/trivy-action's "trivyignores" input for YAML
+# files — that input rewrites ignores into a plain-text temp file and
+# breaks .yml/.yaml parsing. Use env TRIVY_IGNOREFILE instead.
+
+misconfigurations:
+  # Demo: intentionally ignore a subset so CI can pass while other
+  # findings still fail the job until fixed or ignored.
+  - id: AVD-AWS-0089
+    paths:
+      - "terraform/main.tf"
+    statement: Demo ignore — public ACL accepted for this test bucket only
+
+  - id: AVD-AWS-0090
+    paths:
+      - "terraform/main.tf"
+    statement: Demo ignore — logging not required for throwaway test bucket
+
+  - id: AVD-AWS-0132
+    paths:
+      - "terraform/main.tf"
+    statement: Demo ignore — encryption deferred for CI ignorefile test
