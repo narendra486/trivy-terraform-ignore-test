@@ -71,3 +71,26 @@ resource "aws_kinesis_stream" "unencrypted" {
   shard_count = 1
   encryption_type = "NONE"
 }
+
+# Extra finding for the PR branch — unencrypted Elasticsearch domain
+resource "aws_elasticsearch_domain" "insecure" {
+  domain_name = "trivy-test-es"
+
+  ebs_options {
+    ebs_enabled = true
+    volume_size = 10
+  }
+
+  encrypt_at_rest {
+    enabled = false
+  }
+
+  node_to_node_encryption {
+    enabled = false
+  }
+
+  domain_endpoint_options {
+    enforce_https       = false
+    tls_security_policy = "Policy-Min-TLS-1-0-2019-07"
+  }
+}
