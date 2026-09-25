@@ -6,27 +6,26 @@ This repo is a **pipeline-only** Trivy test (no local Trivy CLI required).
 
 ```
 .
-├── .github/workflows/trivy.yml   # PR / push scan
-├── .trivyignore.yaml             # MUST live at repo root (see below)
-└── terraform/                    # intentional insecure AWS Terraform
+├── .github/workflows/trivy.yml            # PR / push scan
+├── .github/workflows/.trivyignore.yaml    # ignorefile (path must match TRIVY_IGNOREFILE)
+└── terraform/                             # intentional insecure AWS Terraform
 ```
 
 ## Where to put `.trivyignore.yaml`
 
-| Location | Works in this CI? | Why |
+| Location | Works? | Notes |
 |---|---|---|
-| **Repo root** `.trivyignore.yaml` | Yes | Matches `scan-ref: .` and `TRIVY_IGNOREFILE: .trivyignore.yaml` |
-| `terraform/.trivyignore.yaml` | No (with current workflow) | Workflow looks at root; missing file → **FATAL** exit |
-| `.github/.trivyignore.yaml` | Only if you change `TRIVY_IGNOREFILE` | Path must match exactly what CI sets |
-| Using action input `trivyignores: .trivyignore.yaml` | Broken | Action copies YAML into a plaintext temp ignore file |
+| `.github/workflows/.trivyignore.yaml` | **Yes (current)** | Matches `TRIVY_IGNOREFILE: .github/workflows/.trivyignore.yaml` |
+| Repo root `.trivyignore.yaml` | Yes, if you change env to match | Path must equal what CI sets |
+| Wrong/missing path while env is set | **No** | Trivy exits **FATAL** |
 
-**Rule:** put the YAML ignore file at the path your workflow sets in `TRIVY_IGNOREFILE`, and commit that file. YAML ignores are experimental and are **not** auto-loaded.
+**Rule:** put the YAML ignore file at the exact path in `TRIVY_IGNOREFILE`. YAML ignores are experimental and are **not** auto-loaded. Finding `paths:` inside the file stay relative to `scan-ref` (repo root), not the ignore file folder.
 
 ## What the PR check does
 
 1. Checks out the PR
 2. Runs `trivy config` on `.` (finds Terraform misconfigs)
-3. Applies suppressions from `.trivyignore.yaml`
+3. Applies suppressions from `.github/workflows/.trivyignore.yaml`
 4. Fails the job if remaining CRITICAL/HIGH/MEDIUM findings exist (`exit-code: 1`)
 
 ## Terraform

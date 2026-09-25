@@ -1,0 +1,32 @@
+# Placed under .github/workflows/ for this CI placement test.
+# Workflow must set:
+#   TRIVY_IGNOREFILE: .github/workflows/.trivyignore.yaml
+#
+# Path is relative to the repo root (Actions checkout working directory).
+# If TRIVY_IGNOREFILE points here but this file is missing → FATAL CI failure.
+#
+# Finding paths below are still relative to scan-ref: "." (repo root),
+# NOT relative to this ignore file's directory.
+#
+# Do NOT use aquasecurity/trivy-action's "trivyignores" input for YAML.
+
+misconfigurations:
+  - id: AVD-AWS-0095
+    paths:
+      - "terraform/more_vulns.tf"
+    statement: Demo ignore — SNS encryption deferred for ignorefile CI test
+
+  - id: AVD-AWS-0096
+    paths:
+      - "terraform/more_vulns.tf"
+    statement: Demo ignore — SQS encryption deferred for ignorefile CI test
+
+  - id: AVD-AWS-0059
+    paths:
+      - "terraform/more_vulns.tf"
+    statement: Demo ignore — password policy number rule accepted for demo
+
+  - id: AVD-AWS-0126
+    paths:
+      - "terraform/more_vulns.tf"
+    statement: Demo ignore — ES TLS policy accepted for PR demo only

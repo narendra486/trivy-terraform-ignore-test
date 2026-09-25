@@ -31,7 +31,7 @@ jobs:
         env:
           # Path is relative to the repo root (checkout working directory).
           # File MUST exist at this path or the job fails fatally.
-          TRIVY_IGNOREFILE: .trivyignore.yaml
+          TRIVY_IGNOREFILE: .github/workflows/.trivyignore.yaml
           TRIVY_SHOW_SUPPRESSED: "true"
 
       - name: Upload Trivy SARIF (informational)
@@ -45,7 +45,7 @@ jobs:
           output: trivy-results.sarif
           exit-code: "0"
         env:
-          TRIVY_IGNOREFILE: .trivyignore.yaml
+          TRIVY_IGNOREFILE: .github/workflows/.trivyignore.yaml
 
       - name: Upload SARIF to GitHub Security
         if: always()
